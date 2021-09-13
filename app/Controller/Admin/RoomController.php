@@ -14,6 +14,7 @@ class RoomController extends \App\Controller\AppController{
     public function __construct(){
         parent::__construct();
         $this->loadmodel('Room');
+        $this->template = 'admin';
     }
 
     public function index(){
