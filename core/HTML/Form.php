@@ -48,8 +48,13 @@ class Form{
     }
 
     protected function getValue($index){
+        $array = json_decode(json_encode($this->data), true);
         if(is_object($this->data)){
-            return $this->data->$index;
+            if(isset($array[$index])){
+                return $this->data->$index;
+            } else {
+                return '';
+            }
         }
         return isset($this->data[$index]) ? $this->data[$index] : null;
     }

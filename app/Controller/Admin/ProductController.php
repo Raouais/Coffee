@@ -7,7 +7,7 @@ class ProductController extends AppController{
     public function __construct(){
         parent::__construct();
         $this->loadmodel('Product');
-        $this->template = 'admin';
+        $this->components[] = 'templates.navbar';
     }
 
     public function index(){

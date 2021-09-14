@@ -7,16 +7,18 @@ class Controller{
 
     protected $viewPath;
     protected $template;
+    protected $components;
 
 
     protected function render($view, $variables = []){
         ob_start();
-
         extract($variables);
+        foreach($this->components as $v){
+            require ($this->viewPath . str_replace('.','/', $v) . '.php');
+        }
         require ($this->viewPath . str_replace('.','/', $view) . '.php');
         $content = ob_get_clean();
         require($this->viewPath . 'templates/'. $this->template . '.php');
-
     }
 
     protected function response($res){

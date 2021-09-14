@@ -1,4 +1,4 @@
-<h1>Interface</h1>
+<h1>Plats</h1>
 
 <div class="container">
     <div class="row">

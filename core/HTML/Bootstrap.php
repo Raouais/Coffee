@@ -25,6 +25,8 @@ class Bootstrap extends Form{
             $input = '<textarea " class="form-control" name="' . $name .'">' . $this->checkInput($name) . '</textarea>' ;    
         } elseif ($type === 'checkbox'){
             $input = '<input type="' . $type . '" name="' . $name . '" value="1" class="form-control">' ;
+        } elseif ($type === 'password'){
+            $input = '<input type="' . $type . '" name="' . $name . '" value="" class="form-control">' ;
         }else {
             $input = '<input type="' . $type . '" name="' . $name . '" value="' . $this->checkInput($name) . '" class="form-control">' ;
         }

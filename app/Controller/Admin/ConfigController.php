@@ -8,7 +8,7 @@ class ConfigController extends AppController{
 
     public function __construct(){
         parent::__construct();
-        $this->template = 'admin';
+        $this->components[] = 'templates.navbar';
     }
 
     public function index(){

@@ -10,6 +10,7 @@ class AppController extends Controller {
 
 
     protected $template = 'default';
+    protected $components = [];
 
     public function __construct(){
         $this->viewPath = ROOT . 'app/Views/';

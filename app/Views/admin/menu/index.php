@@ -1,4 +1,4 @@
-<h1>Produits</h1>
+<h1>Menu</h1>
 
 <div class="container">
     <div class="row">

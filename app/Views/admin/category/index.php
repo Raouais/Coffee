@@ -1,11 +1,11 @@
-<h1>Produits</h1>
+<h1>Catégories</h1>
 
 <div class="container">
     <div class="row">
         <div class="col-md-3">
-            <?php foreach ($products as $p) : ?>
+            <?php foreach ($categories as $c) : ?>
                 <div class="card border-secondary" style="width: 14rem;">
-                    <img src="uploads/<?= $p->imagePath ?>" class="card-img-top" alt="<?= $p->label ?>">
+                    <img src="uploads/<?= $c->imagePath ?>" class="card-img-top" alt="<?= $p->label ?>">
                     <div class="card-body">
                         <h5 class="card-title"><?= $p->label ?></h5>
                         <hr>

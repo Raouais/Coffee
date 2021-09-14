@@ -7,7 +7,7 @@ class UserController extends AppController{
     public function __construct(){
         parent::__construct();
         $this->loadmodel('User');
-        $this->template = 'admin';
+        $this->components[] = 'templates.navbar';
     }
 
     public function index(){
@@ -17,14 +17,18 @@ class UserController extends AppController{
 
     public function add(){
         if(!empty($_POST)){
-            $result = $this->User->create(
-                [
-                'name' => $_POST['name'],
-                'lastname' => $_POST['lastname'],
-                'password' => $_POST['password'],
-                'role_id' => $_POST['role_id'],
-            ]);
+            if($_POST['password'] === $_POST['password_confirm']){
+                $result = $this->User->create(
+                    [
+                    'name' => $_POST['name'],
+                    'lastname' => $_POST['lastname'],
+                    'password' => password_hash($_POST['password'],PASSWORD_BCRYPT),
+                    'role_id' => $_POST['role_id'],
+                ]);
                 return $this->index();
+            } else {
+                echo 'Mots de passe différentes';
+            }
         }
         $form = new \Core\HTML\Bootstrap($_POST);
         $this->render('admin.user.edit', compact('form'));
@@ -34,13 +38,18 @@ class UserController extends AppController{
 
     public function edit(){
         if(!empty($_POST)){
-            $result = $this->User->update(
-                $_GET['id'], [
-                'name' => $_POST['name'],
-                'lastname' => $_POST['lastname'],
-                'password' => $_POST['password'],
-                'role_id' => $_POST['role_id'],
-            ]);
+            if($_POST['password'] === $_POST['password_confirm']){
+                $result = $this->User->update(
+                    $_GET['id'], [
+                    'name' => $_POST['name'],
+                    'lastname' => $_POST['lastname'],
+                    'password' => password_hash($_POST['password'],PASSWORD_BCRYPT),
+                    'role_id' => $_POST['role_id'],
+                ]);
+            } else {
+                echo 'Mots de passe différentes';
+            }
+
             if($result){
                return $this->index();
             }
@@ -53,7 +62,7 @@ class UserController extends AppController{
 
     public function delete(){
         if(!empty($_POST)){
-            $result = $this->User->delete($_POST['id']);
+            $this->User->delete($_POST['id']);
             return $this->index();
         }
     }
