@@ -17,29 +17,28 @@ class CategoryController extends AppController{
             if($hasMany > 0){
                 $title = "Sous catégorie".( $hasMany > 1 ? 's' : '')." de ". $this->Category->find($_GET['id'],'id')->name;
             } else {
-                $title = "Il n'y a aucune catégorie sur l'identifiant ".$_GET['id'];
+                header("Location: index.php?p=admin.category.index");
             }
         } else {
             $hasMany = sizeof($categories->all()) > 1;
             $title = "Principale".( $hasMany ? 's' : '')." catégorie".( $hasMany ? 's' : '');
         }
-
         $this->render('admin.category.index',compact('categories','title'));
     }
 
     public function add(){
+        $title = "Ajout d'une catégorie";
         if(!empty($_POST)){
-            $result = $this->Category->create(
+            $this->Category->create(
                 [
                 'name' => $_POST['name'],
                 'color' => $_POST['color'],
-                'category_id' => $_POST['category_id'],
+                'category_id' => 0,
             ]);
                 return $this->index();
         }
         $form = new \Core\HTML\Bootstrap($_POST);
-        $this->render('admin.category.edit', compact('form'));
-
+        $this->render('admin.category.edit', compact('form', 'title'));
     }
 
     public function addUnderCategory(){
@@ -49,7 +48,7 @@ class CategoryController extends AppController{
                 [
                 'name' => $_POST['name'],
                 'color' => $_POST['color'],
-                'category_id' => $_GET['category_id'],
+                'category_id' => $_GET['id'],
             ]);
                 return $this->index();
         }
@@ -74,15 +73,18 @@ class CategoryController extends AppController{
                return $this->index();
             }
         }
-        $underCategories = $this->Category->findAll($_GET['id'], 'category_id');
         $category = $this->Category->find($_GET['id'], 'id');
+        $title = "Edition de la catégorie: ".$category->name;
+        if($category->category_id != 0){
+            $title = "Edition de la sous catégorie ".$category->name." de ".$this->Category->find($category->category_id, 'id')->name;
+        }
         $form = new \Core\HTML\Bootstrap($category);
-        $this->render('admin.category.edit', compact('form','underCategories','category'));
+        $this->render('admin.category.edit', compact('form','category','title'));
     }
 
     public function delete(){
-        if(!empty($_POST)){
-            $result = $this->Category->delete($_POST['id']);
+        if(!empty($_GET)){
+            $this->Category->delete($_GET['id']);
             return $this->index();
         }
     }
