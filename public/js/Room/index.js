@@ -5,7 +5,8 @@ import {Room} from './Room'
 import { Api } from './Api';
 
 
-const roomID = document.getElementById('room').value;
+const roomTag = document.getElementById('room')
+const roomID = document.getElementById('room_id').value;
 
 
 const api = new Api("http://localhost/Coffee/public/index.php?p=admin",roomID);
@@ -13,7 +14,7 @@ const api = new Api("http://localhost/Coffee/public/index.php?p=admin",roomID);
 const room = new Room(api)
 let isNotModifying = true
 
-const utils = new Utils(room)
+const utils = new Utils(room,roomTag)
 let isShowingUtils = false
 utils.generateUtils()
 
@@ -30,14 +31,14 @@ function switchModifyBtn(){
         modify.className = 'btn btn-success'
         modify.textContent = "Enregistrer"
         if(isShowingUtils){
-            document.body.insertBefore(removeBtn,utils.utilsBox.canvas)
+            roomTag.insertBefore(removeBtn,utils.utilsBox.canvas)
         } else {
-            document.body.insertBefore(removeBtn,room.room.canvas)
+            roomTag.insertBefore(removeBtn,room.room.canvas)
         }
     } else {
         modify.className = 'btn btn-warning'
         modify.textContent = "Modifier"
-        document.body.removeChild(document.getElementById('remove'))
+        roomTag.removeChild(document.getElementById('remove'))
     }
 }
 

@@ -5,7 +5,8 @@ import {Box} from './Box'
 class Utils {
 
 
-    constructor(livingRoom){
+    constructor(livingRoom,roomTag){
+        this.roomTag = roomTag
         this.livingRoom = livingRoom
         this.utils = []
         this.utilGet = null
@@ -54,13 +55,13 @@ class Utils {
 
     showUtils(insertBefore = null){
         if(insertBefore)
-            document.body.insertBefore(this.utilsBox.canvas,insertBefore)
+            this.roomTag.insertBefore(this.utilsBox.canvas,insertBefore)
         else
-            document.body.appendChild(this.utilsBox.canvas)
+            this.roomTag.appendChild(this.utilsBox.canvas)
     }
 
     hideUtils(){
-        document.body.removeChild(document.querySelector('canvas'))
+        this.roomTag.removeChild(document.querySelector('canvas'))
     }
 
     

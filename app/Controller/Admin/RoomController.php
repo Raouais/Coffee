@@ -64,7 +64,6 @@ class RoomController extends \App\Controller\AppController{
 
     public function show(){
         if(!empty($_GET['id'])){
-            $this->template = 'room';
             $item = $this->Room->find($_GET['id'],'id');
             $this->render('room.show', compact('item'));
         }

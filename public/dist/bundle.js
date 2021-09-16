@@ -17629,7 +17629,8 @@ __webpack_require__.r(__webpack_exports__);
 class Utils {
 
 
-    constructor(livingRoom){
+    constructor(livingRoom,roomTag){
+        this.roomTag = roomTag
         this.livingRoom = livingRoom
         this.utils = []
         this.utilGet = null
@@ -17678,13 +17679,13 @@ class Utils {
 
     showUtils(insertBefore = null){
         if(insertBefore)
-            document.body.insertBefore(this.utilsBox.canvas,insertBefore)
+            this.roomTag.insertBefore(this.utilsBox.canvas,insertBefore)
         else
-            document.body.appendChild(this.utilsBox.canvas)
+            this.roomTag.appendChild(this.utilsBox.canvas)
     }
 
     hideUtils(){
-        document.body.removeChild(document.querySelector('canvas'))
+        this.roomTag.removeChild(document.querySelector('canvas'))
     }
 
     
@@ -18003,7 +18004,7 @@ class Box{
         this.canvas = canvas
         this.ctx = canvas.getContext('2d')
         if(insert)
-            document.body.appendChild(canvas)
+            document.getElementById('room').appendChild(canvas)
     }
 
     isNotAtLimitBox(x,y,element){
@@ -18380,7 +18381,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const roomID = document.getElementById('room').value;
+const roomTag = document.getElementById('room')
+const roomID = document.getElementById('room_id').value;
 
 
 const api = new _Api__WEBPACK_IMPORTED_MODULE_4__.Api("http://localhost/Coffee/public/index.php?p=admin",roomID);
@@ -18388,7 +18390,7 @@ const api = new _Api__WEBPACK_IMPORTED_MODULE_4__.Api("http://localhost/Coffee/p
 const room = new _Room__WEBPACK_IMPORTED_MODULE_3__.Room(api)
 let isNotModifying = true
 
-const utils = new _Utils__WEBPACK_IMPORTED_MODULE_2__.Utils(room)
+const utils = new _Utils__WEBPACK_IMPORTED_MODULE_2__.Utils(room,roomTag)
 let isShowingUtils = false
 utils.generateUtils()
 
@@ -18405,14 +18407,14 @@ function switchModifyBtn(){
         modify.className = 'btn btn-success'
         modify.textContent = "Enregistrer"
         if(isShowingUtils){
-            document.body.insertBefore(removeBtn,utils.utilsBox.canvas)
+            roomTag.insertBefore(removeBtn,utils.utilsBox.canvas)
         } else {
-            document.body.insertBefore(removeBtn,room.room.canvas)
+            roomTag.insertBefore(removeBtn,room.room.canvas)
         }
     } else {
         modify.className = 'btn btn-warning'
         modify.textContent = "Modifier"
-        document.body.removeChild(document.getElementById('remove'))
+        roomTag.removeChild(document.getElementById('remove'))
     }
 }
 

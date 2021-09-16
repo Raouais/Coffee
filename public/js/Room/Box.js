@@ -42,7 +42,7 @@ class Box{
         this.canvas = canvas
         this.ctx = canvas.getContext('2d')
         if(insert)
-            document.body.appendChild(canvas)
+            document.getElementById('room').appendChild(canvas)
     }
 
     isNotAtLimitBox(x,y,element){
