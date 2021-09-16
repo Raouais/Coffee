@@ -16,6 +16,7 @@ class ProductController extends AppController{
     }
 
     public function add(){
+        $title = "Ajout d'un produit";
         if(!empty($_POST)){
             $result = $this->Product->create(
                 [
@@ -24,12 +25,12 @@ class ProductController extends AppController{
                 'price' => $_POST['price'],
                 'threshold' => $_POST['threshold'],
                 'category_id' => $_POST['category_id'],
-                'imagePath' => $_POST['imagePath'],
+                'image' => $_POST['image'],
             ]);
                 return $this->index();
         }
         $form = new \Core\HTML\Bootstrap($_POST);
-        $this->render('admin.product.edit', compact('form'));
+        $this->render('admin.product.edit', compact('form','title'));
 
     }
 
@@ -43,7 +44,7 @@ class ProductController extends AppController{
                     'price' => $_POST['price'],
                     'threshold' => $_POST['threshold'],
                     'category_id' => $_POST['category_id'],
-                    'imagePath' => $_POST['imagePath'],
+                    'image' => $_POST['image'],
             ]);
             if($result){
                return $this->index();
@@ -51,8 +52,9 @@ class ProductController extends AppController{
 
         }
         $product = $this->Product->find($_GET['id'], 'id');
+        $title = "Edition du produit ".$product->label;
         $form = new \Core\HTML\Bootstrap($product);
-        $this->render('admin.product.edit', compact('form'));
+        $this->render('admin.product.edit', compact('form','title'));
     }
 
     public function delete(){

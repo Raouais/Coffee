@@ -27,9 +27,12 @@ class Bootstrap extends Form{
             $input = '<input type="' . $type . '" name="' . $name . '" value="1" class="form-control">' ;
         } elseif ($type === 'password'){
             $input = '<input type="' . $type . '" name="' . $name . '" value="" class="form-control">' ;
+        } else if ($type === 'file'){
+            $input = '<br><input type="' . $type . '" name="' . $name . '" accept="image/png, image/jpeg, image/jpg">';
         }else {
             $input = '<input type="' . $type . '" name="' . $name . '" value="' . $this->checkInput($name) . '" class="form-control">' ;
         }
+        
         return $this->surround($label . $input);
     }
 
@@ -60,5 +63,5 @@ class Bootstrap extends Form{
     public function submit($action,$type){
         return $this->surround('<button type="submit" class="btn btn-'.$type.'">'.$action.'</button>');
     }
-    
+
 }

@@ -43,11 +43,17 @@ class Router {
         if(class_exists($controller)){
             $_SESSION['auth_api'] = "ok";
             $controller = new $controller();
-            if( sizeof($pageExploded) === 4){
-                $controller->$action($pageExploded[3]);
+            if(method_exists($controller,$action)){
+                if(sizeof($pageExploded) === 4){
+                    $controller->$action($pageExploded[3]);
+                } else {
+                    $controller->$action();
+                }
             } else {
-                $controller->$action();
+                header('Location: index.php');
             }
+        } else {
+            header('Location: index.php');
         }
 
     }

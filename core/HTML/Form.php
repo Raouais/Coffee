@@ -84,4 +84,43 @@ class Form{
     public function getData(){
         return $this->data;
     }
+
+    public function checkImage($file){
+        if(!empty($_FILES["image"]["name"])){
+            $image = $file;
+            $imagePath = ROOT.'public/uploads/'.$this->generateSalt().'_'.basename($image);
+            $imageExtension = pathinfo($imagePath, PATHINFO_EXTENSION);
+            $isUploadSuccess = true;
+
+            if($imageExtension != "png" && $imageExtension != "jpeg" && $imageExtension != "jpg") {
+                $array["image"] = $form->messageError("Les extensions d'image autorisées sont .png, .jpeg et .jpg !");
+                $isUploadSuccess = false;
+            }
+            if($_FILES["image"]["size"] > 2000000) {
+                $array["image"] = $form->messageError("L'image ne peut pas depasser les 2MB !");
+                $isUploadSuccess = false;
+            }
+            if($isUploadSuccess) {
+                if(!move_uploaded_file($_FILES["image"]["tmp_name"], $imagePath)){
+                    $array["image"] = $form->messageError("Erreur lors de l'upload, recommencez !");
+                    $isUploadSuccess = false;
+                } 
+            } 
+            if($isUploadSuccess){
+                $dao->setTable("image");
+                $dao->create(array('name' => $image, "path" => $imagePath));
+                $fields['refImage'] = $dao->getLastId();
+            }
+        } 
+    }
+
+    function generateSalt($length = 16) {
+	    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	    $charactersLength = strlen($characters);
+	    $randomString = '';
+	    for ($i = 0; $i < $length; $i++) {
+	        $randomString .= $characters[rand(0, $charactersLength - 1)];
+	    }
+	    return $randomString;
+	}
 }
