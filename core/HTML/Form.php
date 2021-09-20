@@ -39,12 +39,16 @@ class Form{
      * @return string
      */
 
-    function checkInput($data){
+    function checkInput($data, $obj = true){
 
         $data = trim($data); 
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
-        return $this->getValue($data);
+        if($obj){
+            return $this->getValue($data);
+        } else {
+            return $data;
+        }
     }
 
     protected function getValue($index){
@@ -85,32 +89,30 @@ class Form{
         return $this->data;
     }
 
-    public function checkImage($file){
+    public function uploadImage(&$error,&$image){
         if(!empty($_FILES["image"]["name"])){
-            $image = $file;
-            $imagePath = ROOT.'public/uploads/'.$this->generateSalt().'_'.basename($image);
+            $salt = $this->generateSalt();
+            $image = $_FILES["image"]["name"];
+            $imagePath = ROOT.'public/uploads/'.$salt.'_'.basename($image);
+            $image = $salt.'_'.basename($image);
             $imageExtension = pathinfo($imagePath, PATHINFO_EXTENSION);
             $isUploadSuccess = true;
 
             if($imageExtension != "png" && $imageExtension != "jpeg" && $imageExtension != "jpg") {
-                $array["image"] = $form->messageError("Les extensions d'image autorisées sont .png, .jpeg et .jpg !");
+                $error = "Les extensions d'image autorisées sont .png, .jpeg et .jpg !";
                 $isUploadSuccess = false;
             }
             if($_FILES["image"]["size"] > 2000000) {
-                $array["image"] = $form->messageError("L'image ne peut pas depasser les 2MB !");
+                $error = "L'image ne peut pas depasser les 2MB !";
                 $isUploadSuccess = false;
             }
             if($isUploadSuccess) {
                 if(!move_uploaded_file($_FILES["image"]["tmp_name"], $imagePath)){
-                    $array["image"] = $form->messageError("Erreur lors de l'upload, recommencez !");
+                    $error = "Erreur lors de l'upload, recommencez !";
                     $isUploadSuccess = false;
                 } 
             } 
-            if($isUploadSuccess){
-                $dao->setTable("image");
-                $dao->create(array('name' => $image, "path" => $imagePath));
-                $fields['refImage'] = $dao->getLastId();
-            }
+            return $isUploadSuccess;
         } 
     }
 
@@ -123,4 +125,5 @@ class Form{
 	    }
 	    return $randomString;
 	}
+
 }

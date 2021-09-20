@@ -5,8 +5,9 @@ import {Room} from './Room'
 import { Api } from './Api';
 
 
-const roomTag = document.getElementById('room')
+
 const roomID = document.getElementById('room_id').value;
+const roomTag = document.getElementById('room')
 
 
 const api = new Api("http://localhost/Coffee/public/index.php?p=admin",roomID);

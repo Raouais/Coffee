@@ -23,45 +23,21 @@
                         <a href="?p=admin.category.edit&id=<?= $c->id ?>" class="btn btn-success">Editer</a>
 
 
-                        <!-- Button trigger modal -->
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal<?= $c->id ?>">
-                            Supprimer
-                        </button>
-
-                        <?php if (!empty($categories->find($c->id, 'category_id'))) {
-                            $hasCategory = true;
+                        <?php
+                        if (!empty($categories->find($c->id, 'category_id'))) {
+                            echo $form->modal(
+                                "Supprimer",
+                                "Impossible de supprimer $c->name",
+                                "La catégorie possède une ou plusieurs sous catégories."
+                            );
                         } else {
-                            $hasCategory = false;
+                            echo $form->modalDelete(
+                                "Supprimer",
+                                "Suppression de $c->name",
+                                "Êtes-vous sûr de vouloir supprimer la catégorie $c->name",
+                                "?p=admin.category.delete&id=$c->id"
+                            );
                         } ?>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="modal<?= $c->id ?>" tabindex="-1" aria-labelledby="modal<?= $c->id ?>Label" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <?php if ($hasCategory) : ?>
-                                            <h5 class="modal-title" id="modal<?= $c->id ?>Label">Impossible de supprimer <?= $c->name ?></h5>
-                                        <?php else : ?>
-                                            <h5 class="modal-title" id="modal<?= $c->id ?>Label">Suppression de <?= $c->name ?></h5>
-                                        <?php endif ?>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <?php if ($hasCategory) : ?>
-                                            La catégorie possède une ou plusieurs sous catégories.
-                                        <?php else : ?>
-                                            Êtes-vous sûr de vouloir supprimer la catégorie <?= $c->name ?> ?
-                                        <?php endif ?>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <?php if (!$hasCategory) : ?>
-                                            <a href="?p=admin.category.delete&id=<?= $c->id ?>" class="btn btn-danger">Oui</a>
-                                            <a data-bs-dismiss="modal" class="btn btn-primary">Non</a>
-                                        <?php endif ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- Sous catégories -->
                         <?php if (!empty($categories->findAll($c->id, 'category_id'))) : ?>

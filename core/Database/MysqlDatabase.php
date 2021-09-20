@@ -30,7 +30,7 @@ class MysqlDatabase extends Database{
     }
 
     public function query(string $statement, string $class_name = null, bool $one = false) {
-        $req = $this->pdo->prepare($this->escape($statement));
+        $req = $this->pdo->prepare($statement);
         $res = $req->execute();
         if(
             strpos($statement, 'UPDATE') === 0 ||
@@ -54,7 +54,7 @@ class MysqlDatabase extends Database{
     }
 
     public function prepare(string $statement, array $attributs, string $class_name = null, bool $one = false){
-        $req = $this->pdo->prepare($this->escape($statement));
+        $req = $this->pdo->prepare($statement);
         $res = $req->execute($attributs);
         if(
             strpos($statement, 'UPDATE') === 0 ||

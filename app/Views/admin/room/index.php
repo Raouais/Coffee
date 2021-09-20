@@ -1,7 +1,5 @@
 <div class="container text-center">
     <h1>Administrer les Salles</h1>
-
-
 <p>
     <a href="?p=admin.room.add" class="btn btn-success">Ajouter</a>
 </p>

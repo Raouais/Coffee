@@ -5,7 +5,7 @@ import {Box} from './Box'
 class Utils {
 
 
-    constructor(livingRoom,roomTag){
+    constructor(livingRoom,roomTag = null){
         this.roomTag = roomTag
         this.livingRoom = livingRoom
         this.utils = []

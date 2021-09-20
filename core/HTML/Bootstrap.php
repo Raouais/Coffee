@@ -41,15 +41,15 @@ class Bootstrap extends Form{
         return $this->surround($link);
     }
 
-    public function select($name, $label, $options){
-        $label = '<label>' . $label . '</label>';
-        $input = '<select class="form-control" name="' . $name . '">';
+    public function select($name, $label, $options, $id = ""){
+        $label = '<br><label>' . $label . '</label>';
+        $input = '<select class="form-control" name="' . $name . '" id="'.$id.'">';
         foreach ($options as $key => $value) {
             $attributes = '';
-            if($key == $this->checkInput($name)){
+            if(!empty($_POST) && $key == $_POST[$id]){
                 $attributes = ' selected';
             }
-            $input .= "<option value='$key'$attributes>$value</option>";
+            $input .= "<option value='$key' $attributes>$value</option>";
         }
         $input .= '</select>';
         return $this->surround($label . $input);
@@ -64,4 +64,53 @@ class Bootstrap extends Form{
         return $this->surround('<button type="submit" class="btn btn-'.$type.'">'.$action.'</button>');
     }
 
+
+    function modalDelete($name,$title,$text,$link){
+        $salt = $this->generateSalt(7);
+        return '<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal'.$salt.'">
+            '.$name.'
+        </button>
+
+        <div class="modal fade" id="modal'.$salt.'" tabindex="-1" aria-labelledby="modal'.$salt.'Label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                            <h5 class="modal-title" id="modal'.$salt.'Label">'.$title.'</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        '.$text.'
+                    </div>
+                    <div class="modal-footer">
+                        <a href="'.$link.'" class="btn btn-danger">Oui</a>
+                        <a data-bs-dismiss="modal" class="btn btn-primary">Non</a>
+                    </div>
+                </div>
+            </div>
+        </div>';
+    }
+
+    function modal($name,$title,$text){
+        $salt = $this->generateSalt(7);
+        return '<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal'.$salt.'">
+            '.$name.'
+        </button>
+
+        <div class="modal fade" id="modal'.$salt.'" tabindex="-1" aria-labelledby="modal'.$salt.'Label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                            <h5 class="modal-title" id="modal'.$salt.'Label">'.$title.'</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        '.$text.'
+                    </div>
+                    <div class="modal-footer">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>';
+    }
 }

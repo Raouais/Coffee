@@ -11,11 +11,15 @@ class CategoryController extends AppController{
     }
 
     public function index(){
+        $form = new \Core\HTML\Bootstrap();
         $categories = $this->Category;
         if(!empty($_GET['id'])){
+            $category = $categories->find($_GET['id'],'id');
             $hasMany = sizeof($categories->findAll($_GET['id'],'category_id'));
             if($hasMany > 0){
                 $title = "Sous catégorie".( $hasMany > 1 ? 's' : '')." de ". $this->Category->find($_GET['id'],'id')->name;
+            } elseif(isset($category)) {
+                header("Location: index.php?p=admin.category.index&id=".$category->category_id);
             } else {
                 header("Location: index.php?p=admin.category.index");
             }
@@ -23,11 +27,16 @@ class CategoryController extends AppController{
             $hasMany = sizeof($categories->all()) > 1;
             $title = "Principale".( $hasMany ? 's' : '')." catégorie".( $hasMany ? 's' : '');
         }
-        $this->render('admin.category.index',compact('categories','title'));
+        $this->render('admin.category.index',compact('categories','title','form'));
     }
 
     public function add(){
         $title = "Ajout d'une catégorie";
+        if(!empty($_GET['id'])){
+            $category = $this->Category->find($_GET['id'],'id');
+            $title = "Ajout d'une sous catégorie de ".$category->name;
+            $id = $_GET['id'];
+        }
         if(!empty($_POST)){
             if($_POST['name'] === "" || $_POST['color'] === ""){
                 $error = "Tout les champs sont obligatoires";
@@ -36,14 +45,10 @@ class CategoryController extends AppController{
                     [
                     'name' => ucfirst($_POST['name']),
                     'color' => $_POST['color'],
-                    'category_id' => 0,
+                    'category_id' => isset($id) ? $id : 0,
                 ]);
                 return $this->index();
             }
-        }
-        if(!empty($_GET['id'])){
-            $category = $this->Category->find($_GET['id'],'id');
-            $title = "Ajout d'une sous catégorie de ".$category->name;
         }
         $form = new \Core\HTML\Bootstrap($_POST);
         $this->render('admin.category.edit', compact('form','category','title','error'));
@@ -65,8 +70,7 @@ class CategoryController extends AppController{
             ]);
             if($result){
                 return $this->index();
-            }
-        
+            }    
         }
         $form = new \Core\HTML\Bootstrap($category);
         $this->render('admin.category.edit', compact('form','category','title','error'));

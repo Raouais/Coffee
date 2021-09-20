@@ -26,7 +26,9 @@ class DBAuth{
             $_SESSION['auth_id'] = $user->id;
             $_SESSION['auth_role'] = $user->role_id;
             return $user;
-        } 
+        } else {
+            return null;
+        }
     }
 
     public function sign($user){
