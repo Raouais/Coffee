@@ -19,11 +19,12 @@
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="?p=admin.product.index">Produits</a></li>
                             <li><a class="dropdown-item" href="?p=admin.menu.index">Menus</a></li>
-                            <li><a class="dropdown-item" href="?p=admin.category.index">Catégories</a></li>
-                            <li><a class="dropdown-item" href="?p=admin.user.index">Utilisateurs</a></li>
-                            <li><a class="dropdown-item" href="?p=admin.room.index">Salles</a></li>
-                            <li><a class="dropdown-item" href="?p=admin.interface.index">Interfaces</a></li>
                             <li><a class="dropdown-item" href="?p=admin.dish.index">Plats</a></li>
+                            <li><a class="dropdown-item" href="?p=admin.category.index">Catégories</a></li>
+                            <li><a class="dropdown-item" href="?p=admin.interface.index">Interfaces</a></li>
+                            <li><a class="dropdown-item" href="?p=admin.room.index">Salles</a></li>
+                            <li><a class="dropdown-item" href="?p=admin.user.index">Utilisateurs</a></li>
+                            <li><a class="dropdown-item" href="?p=admin.user.role">Rôle</a></li>
 
                         </ul>
                     </li>
