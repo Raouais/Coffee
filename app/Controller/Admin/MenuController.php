@@ -11,43 +11,55 @@ class MenuController extends AppController{
     }
 
     public function index(){
+        $form = new \Core\HTML\Bootstrap();
+        $title = "Menu";
         $menus = $this->Menu->all();   
-        $this->render('admin.menu.index',compact('menus'));
+        $this->render('admin.menu.index',compact('menus','menus','title','form'));
     }
 
     public function add(){
+        $form = new \Core\HTML\Bootstrap();
+        $title = "Ajout d'un Menu";
         if(!empty($_POST)){
-            $result = $this->Menu->create(
-                [
-                'name' => $_POST['name'],
-            ]);
+            $isImageUploaded = $form->uploadImage($error,$image);
+            if($_POST['name'] == ""){
+                $error = "Tout les champs sont requis";
+            } elseif($isImageUploaded){
+                $this->Menu->create(
+                    [
+                    'name' => $_POST['name'],
+                    'image' => $image,
+                ]);
                 return $this->index();
+            }
         }
-        $form = new \Core\HTML\Bootstrap($_POST);
-        $this->render('admin.menu.edit', compact('form'));
-
+        $this->render('admin.menu.edit', compact('form','title','error'));
     }
 
-
     public function edit(){
+        if(!empty($_GET)){
+            $menu = $this->Menu->find($_GET['id'], 'id');
+            $form = new \Core\HTML\Bootstrap($menu);
+        }
         if(!empty($_POST)){
+            $isImageUploaded = $form->uploadImage($error,$image);
             $result = $this->Menu->update(
                 $_GET['id'], [
-                'name' => $_POST['name'],
+                    'name' => $_POST['name'],
+                    'image' => isset($menu) && !$isImageUploaded ? $menu->image : $image,
             ]);
-            if($result){
-               return $this->index();
-            }
-
+            if($result)
+                return $this->index();
         }
-        $menu = $this->Menu->find($_GET['id'], 'id');
-        $form = new \Core\HTML\Bootstrap($menu);
-        $this->render('admin.menu.edit', compact('form'));
+        $title = "Edition du Menu ".$menu->name;
+        $this->render('admin.menu.edit', compact('form','title','error'));
     }
 
     public function delete(){
-        if(!empty($_POST)){
-            $result = $this->Menu->delete($_POST['id']);
+        if(!empty($_GET)){
+            $menu = $this->Menu->find($_GET['id'],'id');
+            unlink(ROOT . 'public/uploads/'.$menu->image);
+            $this->Menu->delete($_GET['id']);
             return $this->index();
         }
     }

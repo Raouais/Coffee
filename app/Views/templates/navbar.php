@@ -24,7 +24,7 @@
                             <li><a class="dropdown-item" href="?p=admin.interface.index">Interfaces</a></li>
                             <li><a class="dropdown-item" href="?p=admin.room.index">Salles</a></li>
                             <li><a class="dropdown-item" href="?p=admin.user.index">Utilisateurs</a></li>
-                            <li><a class="dropdown-item" href="?p=admin.user.role">Rôle</a></li>
+                            <!-- <li><a class="dropdown-item" href="?p=admin.role.index">Rôle</a></li> -->
 
                         </ul>
                     </li>

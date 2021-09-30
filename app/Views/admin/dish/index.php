@@ -1,21 +1,30 @@
-<h1>Plats</h1>
-
-<div class="container">
+<div class="container text-center">
+    <h1><?= $title ?></h1>
+    <hr>
+    <br>
+    <a href="?p=admin.dish.add" class="btn btn-primary">Ajouter un nouveau plat</a>
     <div class="row">
-        <div class="col-md-3">
-            <?php foreach ($products as $p) : ?>
-                <div class="card border-secondary" style="width: 14rem;">
-                    <img src="uploads/<?= $p->imagePath ?>" class="card-img-top" alt="<?= $p->label ?>">
-                    <div class="card-body">
-                        <h5 class="card-title"><?= $p->label ?></h5>
-                        <hr>
-                        <p class="card-text">Quantité: <?= $p->quantity ?></p>
-                        <p class="card-text">Prix: <?= $p->price ?> €</p>
-                        <a href="?p=admin.product.edit&id=<?= $p->id ?>" class="btn btn-primary">Editer</a>
-                        <a href="?p=admin.product.delete&id=<?= $p->id ?>" class="btn btn-danger">Supprimer</a>
+        <?php if (isset($dishes)) : ?>
+            <?php foreach ($dishes as $d) : ?>
+                <div class="col-md-3">
+                    <div class="card border-secondary">
+                        <img src="uploads/<?= $d->image ?>" class="card-img-top" alt="<?= $d->name ?>">
+                        <div class="card-body">
+                            <h5 class="card-title"><?= $d->name ?></h5>
+                            <hr>
+                            <p class="card-text">Prix: <?= $d->price ?> €</p>
+                            <a href="?p=admin.dish.edit&id=<?= $d->id ?>" class="btn btn-success">Editer</a>
+                            <?= $form->modalDelete(
+                                "Supprimer",
+                                "Suppression de $d->name",
+                                "Êtes-vous sûr de vouloir supprimer le plat $d->name",
+                                "?p=admin.dish.delete&id=$d->id"
+                            );
+                            ?>
+                        </div>
                     </div>
                 </div>
-            <?php endforeach; ?>
-        </div>
+            <?php endforeach ?>
+        <?php endif ?>
     </div>
 </div>

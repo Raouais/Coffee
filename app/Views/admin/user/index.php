@@ -1,5 +1,8 @@
 <div class="container text-center">
-    <h1>Utilisateurs</h1>
+    <h1><?= $title ?></h1>
+    <hr>
+    <br>
+    <a href="?p=admin.user.add" class="btn btn-primary">Ajouter un nouvel utilisateur</a>
     <br>
     <br>
     <br>
@@ -11,9 +14,15 @@
                     <div class="card-body">
                         <h5 class="card-title"><?= $u->name; $u->lastname; ?></h5>
                         <hr>
-                        <p class="card-text">Rôle: <?= $u->role_id ?></p>
+                        <p class="card-text"><?= $role->find($u->role_id,'id')->name ?></p>
                         <a href="?p=admin.user.edit&id=<?= $u->id ?>" class="btn btn-primary">Editer</a>
-                        <a href="?p=admin.user.delete&id=<?= $u->id ?>" class="btn btn-danger">Supprimer</a>
+                        <?= $form->modalDelete(
+                                "Supprimer",
+                                "Suppression de $u->name",
+                                "Êtes-vous sûr de vouloir supprimer l'utilisateur $u->name",
+                                "?p=admin.user.delete&id=$u->id"
+                            );
+                        ?>
                     </div>
                 </div>
             </div>

@@ -20,7 +20,7 @@ class LogController extends AppController{
         $title = "Authentification";
 
         if(isset($_SESSION['auth_id'])){
-            if($_SESSION['auth_role'] === "1"){
+            if($_SESSION['auth_role'] === 1){
                 header('Location: index.php?p=admin.config.index');
             } else {
                 header('Location: index.php?p=user.profile');

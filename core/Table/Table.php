@@ -61,6 +61,10 @@ class Table{
         return $this->query("DELETE FROM `{$this->table}` WHERE id = ?", [$id], true);
     }
 
+    public function deleteBy($what,$where){
+        return $this->query("DELETE FROM `{$this->table}` WHERE {$where} = ?", [$what], true);
+    }
+
     public function extract($key, $value){
         $records = $this->all();
         $return = [];

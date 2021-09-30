@@ -8,18 +8,17 @@ use \Core\Auth\DBAuth;
 
 class RoomController extends \App\Controller\AppController{
 
-
-
-
     public function __construct(){
         parent::__construct();
         $this->loadmodel('Room');
+        $this->loadmodel('Board');
+        $this->loadmodel('Wall');
         $this->components[] = 'templates.navbar';
     }
 
     public function index(){
         $items = $this->Room->all();
-        $from = new \Core\HTML\Bootstrap($_POST);
+        $form = new \Core\HTML\Bootstrap($_POST);
         $this->render('admin.room.index', compact('form','items'));
     }
 
@@ -56,8 +55,19 @@ class RoomController extends \App\Controller\AppController{
     }
 
     public function delete(){
-        if(!empty($_POST)){
-            $result = $this->Room->delete($_POST['id']);
+        if(!empty($_GET)){
+            $this->Room->delete($_GET['id']);
+            $nbTables = sizeof($this->Board->findAll($_GET['id'],'room_id'));
+            $nbWalls = sizeof($this->Wall->findAll($_GET['id'],'room_id'));
+
+            for($i = 0; $i < $nbTables; $i++){
+                $this->Board->deleteBy($_GET['id'],'room_id');
+            }
+
+            for($i = 0; $i < $nbWalls; $i++){
+                $this->Wall->deleteBy($_GET['id'],'room_id');
+            }
+
             return $this->index();
         }
     }

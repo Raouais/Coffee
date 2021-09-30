@@ -74,9 +74,9 @@ class MysqlDatabase extends Database{
             $data = $req->fetchAll();
         }
         return $data;
-        }
+    }
 
-        public function lastInsertId(){
-            return $this->pdo->lastInsertId();
-        }
+    public function lastInsertId(){
+        return $this->pdo->lastInsertId();
+    }
 }

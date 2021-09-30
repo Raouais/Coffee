@@ -19,14 +19,18 @@
                     <a href="?p=admin.room.edit&id=<?= $room->id;?>" class="btn btn-primary">Editer</a>
                     <form action="?p=admin.room.delete" method="post" style="display:inline;">
                         <input type="hidden" name="id" value="<?= $room->id;?>">
-                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                        <?= $form->modalDelete(
+                                "Supprimer",
+                                "Suppression de $room->name",
+                                "Êtes-vous sûr de vouloir supprimer la salle $room->name et toutes ses tables ?",
+                                "?p=admin.room.delete&id=$room->id"
+                            ); 
+                        ?>
                     </form>
                 </td>
             </tr>
         <?php endforeach; ?>
     </tbody>
 </table>
-
-
 
 </div>

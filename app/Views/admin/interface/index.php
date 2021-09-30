@@ -1,21 +1,39 @@
-<h1>Interface</h1>
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-3">
-            <?php foreach ($products as $p) : ?>
-                <div class="card border-secondary" style="width: 14rem;">
-                    <img src="uploads/<?= $p->imagePath ?>" class="card-img-top" alt="<?= $p->label ?>">
-                    <div class="card-body">
-                        <h5 class="card-title"><?= $p->label ?></h5>
-                        <hr>
-                        <p class="card-text">Quantité: <?= $p->quantity ?></p>
-                        <p class="card-text">Prix: <?= $p->price ?> €</p>
-                        <a href="?p=admin.product.edit&id=<?= $p->id ?>" class="btn btn-primary">Editer</a>
-                        <a href="?p=admin.product.delete&id=<?= $p->id ?>" class="btn btn-danger">Supprimer</a>
-                    </div>
-                </div>
+<div class="container text-center">
+    <h1><?= $title ?></h1>
+    <hr>
+    <br>
+    <a href="?p=admin.interface.add" class="btn btn-primary">Ajouter une nouvelle interface</a>
+    <br>
+    <br>
+    <br>
+    <table class="table">
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>Nom</td>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($interfaces as $i) : ?>
+                <tr>
+                    <td><?= $i->id ?></td>
+                    <td> <a href="?p=admin.interface.show&id=<?= $i->id ?>" class="btn btn-info"><?= $i->name ?></a></td>
+                    <td>
+                        <a href="?p=admin.interface.edit&id=<?= $i->id; ?>" class="btn btn-primary">Editer</a>
+                        <form action="?p=admin.interface.delete" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="<?= $i->id; ?>">
+                            <?= $form->modalDelete(
+                                "Supprimer",
+                                "Suppression de $i->name",
+                                "Êtes-vous sûr de vouloir supprimer l'interface $i->name",
+                                "?p=admin.interface.delete&id=$i->id"
+                            );
+                            ?>
+                        </form>
+                    </td>
+                </tr>
             <?php endforeach; ?>
-        </div>
-    </div>
+        </tbody>
+    </table>
+
 </div>
