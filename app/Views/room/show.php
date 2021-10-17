@@ -14,5 +14,5 @@
         <button type="button" id="modify" class="btn btn-warning">Modifier</button>
         <button type="button" id="add" class="btn btn-primary">Outils</button>
         <?php endif?>
-    <script src="dist/bundle.js"></script>
+    <script src="dist/room.js"></script>
 </div>

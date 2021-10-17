@@ -9,7 +9,7 @@ class Router {
     private static $_instance;
 
     public function __construct() {
-        $this->requestingModes = array('admin' => 'admin','api' => 'api', 'admin_api' => 'adapi');
+        $this->requestingModes = array('admin' => 'admin','api' => 'api');
     }
 
     public static function getInstance(){
@@ -29,23 +29,22 @@ class Router {
         
         $pageExploded = explode('.', $page);
         
-        if($pageExploded[0] === $this->requestingModes['admin'] || $pageExploded[0] === $this->requestingModes['admin_api']){
+        if($pageExploded[0] === $this->requestingModes['admin']){
             $controller = 'App\Controller\Admin\\' . ucfirst($pageExploded[1]) . 'Controller';
             $action = $pageExploded[2];
         } else if($pageExploded[0] === $this->requestingModes['api']){
-            $controller = 'App\Controller\\' . ucfirst($pageExploded[1]) . 'Controller';
-            $action = $pageExploded[2];            
+            $controller = 'App\Controller\Admin\\' . ucfirst($pageExploded[1]) . 'Controller';
+            $action = $this->getAction();
         } else {
             $controller = 'App\Controller\\' . ucfirst($pageExploded[0]) . 'Controller';
             $action = $pageExploded[1];
         }
 
         if(class_exists($controller)){
-            $_SESSION['auth_api'] = "ok";
             $controller = new $controller();
             if(method_exists($controller,$action)){
-                if(sizeof($pageExploded) === 4){
-                    $controller->$action($pageExploded[3]);
+                if(sizeof($pageExploded) === 3){
+                    $controller->$action($pageExploded[2]);
                 } else {
                     $controller->$action();
                 }
@@ -55,7 +54,27 @@ class Router {
         } else {
             header('Location: index.php');
         }
-
     }
 
+    private function getAction(){
+        switch($_SERVER["REQUEST_METHOD"]){
+            case 'GET':
+                $action = "list";
+            break;
+            
+            case 'PATCH':
+                $action = "edit";
+            break;
+            
+            case 'POST':
+                $action = "add";
+            break;
+            
+            case 'DELETE':
+                $action = "delete";
+            break;
+            
+        }
+        return $action;
+    }
 }

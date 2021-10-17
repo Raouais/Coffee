@@ -7,14 +7,27 @@ class DishController extends AppController{
     public function __construct(){
         parent::__construct();
         $this->loadmodel('Dish');
+        $this->loadmodel('Menu');
+        $this->loadmodel('DishesInMenu');
         $this->components[] = 'templates.navbar';
     }
     
     public function index(){
+        $dishes = $this->Dish->all();   
+        $selected = 0;
+        if(!empty($_POST) && isset($_POST['menu'])){
+            if($_POST['menu'] == 0){
+                $dishes = $this->Dish->all();   
+                $selected = 0;
+            } else {
+                $dishes = $this->Dish->getByMenu($_POST['menu']);
+                $selected = $_POST['menu'];
+            }
+        }
         $title = "Plats";
         $form = new \Core\HTML\Bootstrap();
-        $dishes = $this->Dish->all();   
-        $this->render('admin.dish.index',compact('dishes','form','title'));
+        $menus = $this->Menu->all();
+        $this->render('admin.dish.index',compact('dishes','form','title','menus','selected'));
     }
 
     public function add(){

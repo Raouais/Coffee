@@ -1,17 +1,16 @@
 class Api{
 
     constructor(url,id){
-        this.url = url
+        this.url = url 
         this.id = id
     }
 
-
     setUrl(url){
-        this.url = url
+        this.url = url + this.id
     }
 
     async list(){
-        const res = await fetch(this.url+".list."+this.id, {
+        const res = await fetch(this.url, {
             method: 'GET'
             // headers: this.headers,
         })
@@ -20,7 +19,7 @@ class Api{
     }
     
     async insert(value){
-        const res = await fetch(this.url+".add."+this.id,{
+        const res = await fetch(this.url,{
             method: 'POST',
             body: JSON.stringify(value)
         })
@@ -28,14 +27,14 @@ class Api{
     } 
 
     async delete(value) {
-        const res = await fetch(this.url+".delete."+this.id, {
+        const res = await fetch(this.url, {
             method: 'DELETE',
             body: JSON.stringify(value)
         })
     }
 
     async update(value) {
-        const res = await fetch(this.url+".edit."+this.id, {
+        const res = await fetch(this.url, {
             method: 'PATCH',
             body: JSON.stringify(value)
         })

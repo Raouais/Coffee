@@ -18,7 +18,7 @@ class Table {
         this.margeColor = "#fff"
         this.color = this.defaultColor
         this.amIATable = true;
-        this.url = "http://localhost/Coffee/public/index.php?p=admin.board"
+        this.url = "http://localhost/Coffee/public/index.php?p=api.board"
     }
 
     toJson(){

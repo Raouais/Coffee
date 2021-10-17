@@ -10,7 +10,7 @@ class Wall{
         this.size = size
         this.selected = false
         this.color = "#000"
-        this.url = "http://localhost/Coffee/public/index.php?p=admin.wall"
+        this.url = "http://localhost/Coffee/public/index.php?p=api.wall"
 
     }
 

@@ -2,15 +2,14 @@ import _, { update } from 'lodash'
 import './style.css'
 import {Utils} from './Utils'
 import {Room} from './Room'
-import { Api } from './Api';
+import { Api } from '../Api/Api';
 
 
 
-const roomID = document.getElementById('room_id').value;
+const roomID = "."+document.getElementById('room_id').value
 const roomTag = document.getElementById('room')
 
-
-const api = new Api("http://localhost/Coffee/public/index.php?p=admin",roomID);
+const api = new Api("",roomID);
 
 const room = new Room(api)
 let isNotModifying = true

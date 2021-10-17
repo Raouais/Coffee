@@ -17266,13 +17266,13 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 "use strict";
 
 
-var stylesInDom = [];
+var stylesInDOM = [];
 
 function getIndexByIdentifier(identifier) {
   var result = -1;
 
-  for (var i = 0; i < stylesInDom.length; i++) {
-    if (stylesInDom[i].identifier === identifier) {
+  for (var i = 0; i < stylesInDOM.length; i++) {
+    if (stylesInDOM[i].identifier === identifier) {
       result = i;
       break;
     }
@@ -17291,20 +17291,24 @@ function modulesToDom(list, options) {
     var count = idCountMap[id] || 0;
     var identifier = "".concat(id, " ").concat(count);
     idCountMap[id] = count + 1;
-    var index = getIndexByIdentifier(identifier);
+    var indexByIdentifier = getIndexByIdentifier(identifier);
     var obj = {
       css: item[1],
       media: item[2],
-      sourceMap: item[3]
+      sourceMap: item[3],
+      supports: item[4],
+      layer: item[5]
     };
 
-    if (index !== -1) {
-      stylesInDom[index].references++;
-      stylesInDom[index].updater(obj);
+    if (indexByIdentifier !== -1) {
+      stylesInDOM[indexByIdentifier].references++;
+      stylesInDOM[indexByIdentifier].updater(obj);
     } else {
-      stylesInDom.push({
+      var updater = addElementStyle(obj, options);
+      options.byIndex = i;
+      stylesInDOM.splice(i, 0, {
         identifier: identifier,
-        updater: addStyle(obj, options),
+        updater: updater,
         references: 1
       });
     }
@@ -17315,12 +17319,13 @@ function modulesToDom(list, options) {
   return identifiers;
 }
 
-function addStyle(obj, options) {
+function addElementStyle(obj, options) {
   var api = options.domAPI(options);
   api.update(obj);
-  return function updateStyle(newObj) {
+
+  var updater = function updater(newObj) {
     if (newObj) {
-      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap) {
+      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap && newObj.supports === obj.supports && newObj.layer === obj.layer) {
         return;
       }
 
@@ -17329,6 +17334,8 @@ function addStyle(obj, options) {
       api.remove();
     }
   };
+
+  return updater;
 }
 
 module.exports = function (list, options) {
@@ -17341,7 +17348,7 @@ module.exports = function (list, options) {
     for (var i = 0; i < lastIdentifiers.length; i++) {
       var identifier = lastIdentifiers[i];
       var index = getIndexByIdentifier(identifier);
-      stylesInDom[index].references--;
+      stylesInDOM[index].references--;
     }
 
     var newLastIdentifiers = modulesToDom(newList, options);
@@ -17351,10 +17358,10 @@ module.exports = function (list, options) {
 
       var _index = getIndexByIdentifier(_identifier);
 
-      if (stylesInDom[_index].references === 0) {
-        stylesInDom[_index].updater();
+      if (stylesInDOM[_index].references === 0) {
+        stylesInDOM[_index].updater();
 
-        stylesInDom.splice(_index, 1);
+        stylesInDOM.splice(_index, 1);
       }
     }
 
@@ -17370,16 +17377,38 @@ module.exports = function (list, options) {
 
 
 /* istanbul ignore next  */
-function apply(style, options, obj) {
-  var css = obj.css;
-  var media = obj.media;
-  var sourceMap = obj.sourceMap;
+function apply(styleElement, options, obj) {
+  var css = "";
 
-  if (media) {
-    style.setAttribute("media", media);
-  } else {
-    style.removeAttribute("media");
+  if (obj.supports) {
+    css += "@supports (".concat(obj.supports, ") {");
   }
+
+  if (obj.media) {
+    css += "@media ".concat(obj.media, " {");
+  }
+
+  var needLayer = typeof obj.layer !== "undefined";
+
+  if (needLayer) {
+    css += "@layer".concat(obj.layer.length > 0 ? " ".concat(obj.layer) : "", " {");
+  }
+
+  css += obj.css;
+
+  if (needLayer) {
+    css += "}";
+  }
+
+  if (obj.media) {
+    css += "}";
+  }
+
+  if (obj.supports) {
+    css += "}";
+  }
+
+  var sourceMap = obj.sourceMap;
 
   if (sourceMap && typeof btoa !== "undefined") {
     css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
@@ -17388,28 +17417,28 @@ function apply(style, options, obj) {
   /* istanbul ignore if  */
 
 
-  options.styleTagTransform(css, style);
+  options.styleTagTransform(css, styleElement, options.options);
 }
 
-function removeStyleElement(style) {
+function removeStyleElement(styleElement) {
   // istanbul ignore if
-  if (style.parentNode === null) {
+  if (styleElement.parentNode === null) {
     return false;
   }
 
-  style.parentNode.removeChild(style);
+  styleElement.parentNode.removeChild(styleElement);
 }
 /* istanbul ignore next  */
 
 
 function domAPI(options) {
-  var style = options.insertStyleElement(options);
+  var styleElement = options.insertStyleElement(options);
   return {
     update: function update(obj) {
-      apply(style, options, obj);
+      apply(styleElement, options, obj);
     },
     remove: function remove() {
-      removeStyleElement(style);
+      removeStyleElement(styleElement);
     }
   };
 }
@@ -17469,11 +17498,11 @@ module.exports = insertBySelector;
 
 
 /* istanbul ignore next  */
-function setAttributesWithoutAttributes(style) {
+function setAttributesWithoutAttributes(styleElement) {
   var nonce =  true ? __webpack_require__.nc : 0;
 
   if (nonce) {
-    style.setAttribute("nonce", nonce);
+    styleElement.setAttribute("nonce", nonce);
   }
 }
 
@@ -17488,10 +17517,10 @@ module.exports = setAttributesWithoutAttributes;
 
 /* istanbul ignore next  */
 function insertStyleElement(options) {
-  var style = document.createElement("style");
-  options.setAttributes(style, options.attributes);
-  options.insert(style);
-  return style;
+  var element = document.createElement("style");
+  options.setAttributes(element, options.attributes);
+  options.insert(element, options.options);
+  return element;
 }
 
 module.exports = insertStyleElement;
@@ -17504,15 +17533,15 @@ module.exports = insertStyleElement;
 
 
 /* istanbul ignore next  */
-function styleTagTransform(css, style) {
-  if (style.styleSheet) {
-    style.styleSheet.cssText = css;
+function styleTagTransform(css, styleElement) {
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = css;
   } else {
-    while (style.firstChild) {
-      style.removeChild(style.firstChild);
+    while (styleElement.firstChild) {
+      styleElement.removeChild(styleElement.firstChild);
     }
 
-    style.appendChild(document.createTextNode(css));
+    styleElement.appendChild(document.createTextNode(css));
   }
 }
 
@@ -17527,11 +17556,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(11);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
 // Imports
 
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "", ""]);
 // Exports
@@ -17545,41 +17577,70 @@ ___CSS_LOADER_EXPORT___.push([module.id, "", ""]);
 "use strict";
 
 
+module.exports = function (i) {
+  return i[1];
+};
+
+/***/ }),
+/* 11 */
+/***/ ((module) => {
+
+"use strict";
+
+
 /*
   MIT License http://www.opensource.org/licenses/mit-license.php
   Author Tobias Koppers @sokra
 */
-// css base code, injected by the css-loader
-// eslint-disable-next-line func-names
 module.exports = function (cssWithMappingToString) {
   var list = []; // return the list of modules as css string
 
   list.toString = function toString() {
     return this.map(function (item) {
-      var content = cssWithMappingToString(item);
+      var content = "";
+      var needLayer = typeof item[5] !== "undefined";
+
+      if (item[4]) {
+        content += "@supports (".concat(item[4], ") {");
+      }
 
       if (item[2]) {
-        return "@media ".concat(item[2], " {").concat(content, "}");
+        content += "@media ".concat(item[2], " {");
+      }
+
+      if (needLayer) {
+        content += "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {");
+      }
+
+      content += cssWithMappingToString(item);
+
+      if (needLayer) {
+        content += "}";
+      }
+
+      if (item[2]) {
+        content += "}";
+      }
+
+      if (item[4]) {
+        content += "}";
       }
 
       return content;
     }).join("");
   }; // import a list of modules into the list
-  // eslint-disable-next-line func-names
 
 
-  list.i = function (modules, mediaQuery, dedupe) {
+  list.i = function i(modules, media, dedupe, supports, layer) {
     if (typeof modules === "string") {
-      // eslint-disable-next-line no-param-reassign
-      modules = [[null, modules, ""]];
+      modules = [[null, modules, undefined]];
     }
 
     var alreadyImportedModules = {};
 
     if (dedupe) {
-      for (var i = 0; i < this.length; i++) {
-        // eslint-disable-next-line prefer-destructuring
-        var id = this[i][0];
+      for (var _i = 0; _i < this.length; _i++) {
+        var id = this[_i][0];
 
         if (id != null) {
           alreadyImportedModules[id] = true;
@@ -17587,19 +17648,37 @@ module.exports = function (cssWithMappingToString) {
       }
     }
 
-    for (var _i = 0; _i < modules.length; _i++) {
-      var item = [].concat(modules[_i]);
+    for (var _i2 = 0; _i2 < modules.length; _i2++) {
+      var item = [].concat(modules[_i2]);
 
       if (dedupe && alreadyImportedModules[item[0]]) {
-        // eslint-disable-next-line no-continue
         continue;
       }
 
-      if (mediaQuery) {
-        if (!item[2]) {
-          item[2] = mediaQuery;
+      if (typeof layer !== "undefined") {
+        if (typeof item[5] === "undefined") {
+          item[5] = layer;
         } else {
-          item[2] = "".concat(mediaQuery, " and ").concat(item[2]);
+          item[1] = "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {").concat(item[1], "}");
+          item[5] = layer;
+        }
+      }
+
+      if (media) {
+        if (!item[2]) {
+          item[2] = media;
+        } else {
+          item[1] = "@media ".concat(item[2], " {").concat(item[1], "}");
+          item[2] = media;
+        }
+      }
+
+      if (supports) {
+        if (!item[4]) {
+          item[4] = "".concat(supports);
+        } else {
+          item[1] = "@supports (".concat(item[4], ") {").concat(item[1], "}");
+          item[4] = supports;
         }
       }
 
@@ -17611,7 +17690,7 @@ module.exports = function (cssWithMappingToString) {
 };
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -17619,9 +17698,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Utils": () => (/* binding */ Utils)
 /* harmony export */ });
-/* harmony import */ var _Table__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(12);
-/* harmony import */ var _Wall__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
-/* harmony import */ var _Box__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(14);
+/* harmony import */ var _Table__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(13);
+/* harmony import */ var _Wall__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(14);
+/* harmony import */ var _Box__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(15);
 
 
 
@@ -17629,7 +17708,7 @@ __webpack_require__.r(__webpack_exports__);
 class Utils {
 
 
-    constructor(livingRoom,roomTag){
+    constructor(livingRoom,roomTag = null){
         this.roomTag = roomTag
         this.livingRoom = livingRoom
         this.utils = []
@@ -17736,7 +17815,7 @@ class Utils {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -17766,7 +17845,7 @@ class Table {
         this.margeColor = "#fff"
         this.color = this.defaultColor
         this.amIATable = true;
-        this.url = "http://localhost/Coffee/public/index.php?p=admin.board"
+        this.url = "http://localhost/Coffee/public/index.php?p=api.board"
     }
 
     toJson(){
@@ -17877,7 +17956,7 @@ class Table {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -17899,7 +17978,7 @@ class Wall{
         this.size = size
         this.selected = false
         this.color = "#000"
-        this.url = "http://localhost/Coffee/public/index.php?p=admin.wall"
+        this.url = "http://localhost/Coffee/public/index.php?p=api.wall"
 
     }
 
@@ -17952,7 +18031,7 @@ class Wall{
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -18053,7 +18132,7 @@ class Box{
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -18061,9 +18140,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Room": () => (/* binding */ Room)
 /* harmony export */ });
-/* harmony import */ var _Box__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(14);
-/* harmony import */ var _Table__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(12);
-/* harmony import */ var _Wall__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
+/* harmony import */ var _Box__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(15);
+/* harmony import */ var _Table__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
+/* harmony import */ var _Wall__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(14);
 
 
 
@@ -18088,6 +18167,7 @@ class Room {
     async getTables(){
         this.api.setUrl(new _Table__WEBPACK_IMPORTED_MODULE_1__.Table().url)
         const tables = await this.api.list()
+        console.log(tables)
         tables.results.forEach(t => {
             this.addElement(new _Table__WEBPACK_IMPORTED_MODULE_1__.Table(parseInt(t.id),parseInt(t.number),[parseInt(t.position_x),parseInt(t.position_y)],[parseInt(t.size),parseInt(t.size)],t.format),false,false)
             this.nbTables++
@@ -18217,7 +18297,7 @@ class Room {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -18228,17 +18308,16 @@ __webpack_require__.r(__webpack_exports__);
 class Api{
 
     constructor(url,id){
-        this.url = url
+        this.url = url 
         this.id = id
     }
 
-
     setUrl(url){
-        this.url = url
+        this.url = url + this.id
     }
 
     async list(){
-        const res = await fetch(this.url+".list."+this.id, {
+        const res = await fetch(this.url, {
             method: 'GET'
             // headers: this.headers,
         })
@@ -18247,7 +18326,7 @@ class Api{
     }
     
     async insert(value){
-        const res = await fetch(this.url+".add."+this.id,{
+        const res = await fetch(this.url,{
             method: 'POST',
             body: JSON.stringify(value)
         })
@@ -18255,14 +18334,14 @@ class Api{
     } 
 
     async delete(value) {
-        const res = await fetch(this.url+".delete."+this.id, {
+        const res = await fetch(this.url, {
             method: 'DELETE',
             body: JSON.stringify(value)
         })
     }
 
     async update(value) {
-        const res = await fetch(this.url+".edit."+this.id, {
+        const res = await fetch(this.url, {
             method: 'PATCH',
             body: JSON.stringify(value)
         })
@@ -18371,9 +18450,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _style_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
-/* harmony import */ var _Utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(11);
-/* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(15);
-/* harmony import */ var _Api__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(16);
+/* harmony import */ var _Utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(12);
+/* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(16);
+/* harmony import */ var _Api_Api__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(17);
 
 
 
@@ -18381,11 +18460,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+const roomID = "."+document.getElementById('room_id').value
 const roomTag = document.getElementById('room')
-const roomID = document.getElementById('room_id').value;
 
-
-const api = new _Api__WEBPACK_IMPORTED_MODULE_4__.Api("http://localhost/Coffee/public/index.php?p=admin",roomID);
+const api = new _Api_Api__WEBPACK_IMPORTED_MODULE_4__.Api("",roomID);
 
 const room = new _Room__WEBPACK_IMPORTED_MODULE_3__.Room(api)
 let isNotModifying = true

@@ -22,6 +22,7 @@ class Room {
     async getTables(){
         this.api.setUrl(new Table().url)
         const tables = await this.api.list()
+        console.log(tables)
         tables.results.forEach(t => {
             this.addElement(new Table(parseInt(t.id),parseInt(t.number),[parseInt(t.position_x),parseInt(t.position_y)],[parseInt(t.size),parseInt(t.size)],t.format),false,false)
             this.nbTables++

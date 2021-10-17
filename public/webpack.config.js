@@ -1,10 +1,14 @@
 const path = require('path');
 
 module.exports = {
-  entry: './js/Room/index.js',
+  entry: {
+    room : './js/Room/index.js',
+    api: './js/Api/Api.js',
+    command:'./js/Command/admin.js'
+  },
   mode: 'none',
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
   },
     devServer: {
